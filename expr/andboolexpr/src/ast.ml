@@ -5,3 +5,4 @@ type boolExpr =
   | And of boolExpr * boolExpr
   | Or of boolExpr * boolExpr
   | If of boolExpr * boolExpr * boolExpr
+;;

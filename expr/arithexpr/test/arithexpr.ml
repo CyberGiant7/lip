@@ -2,11 +2,11 @@ open ArithexprLib.Main
 
 (* wrapping results for testing *)
 
-type wexprval = Ok of exprval | Error
+type wexprval = Ok of exprval | Error;;
 
 let string_of_wval = function 
     Ok v -> string_of_val v
-  | _ -> "Error"
+  | _ -> "Error";;
 
 let weval e = try Ok (eval e) 
   with _ -> Error
@@ -19,7 +19,7 @@ let tests = [
   ("succ succ succ pred pred succ succ pred succ pred succ 0", Nat 3);
   ("iszero pred succ 0", Bool true);
   ("iszero pred succ 0 and not iszero succ pred succ 0", Bool true);
-]
+];;
 
 let oktests = List.map (fun (x,y) -> (x,Ok y)) tests;;
 
@@ -30,8 +30,9 @@ let errtests = [
   ("pred 0", Error);
   ("pred pred succ 0", Error)
 ]
+;;
 
-let%test _ = List.fold_left
+let test _ = List.fold_left
     (fun b (s,v) ->
        print_string (s ^ " => ");
        let b' = ((s |> parse |> weval) = v) in
@@ -41,3 +42,6 @@ let%test _ = List.fold_left
        b && b')
     true
     (oktests @ errtests)
+;;
+
+test "";;
