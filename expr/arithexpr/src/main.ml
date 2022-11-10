@@ -21,6 +21,7 @@ type exprval =
 let string_of_val = function
     Bool(b) -> string_of_bool b
   | Nat(n) -> string_of_int n
+;;
 
 let parse (s : string) : expr =
   let lexbuf = Lexing.from_string s in
@@ -30,8 +31,10 @@ let parse (s : string) : expr =
 (******************************************************************************)
 (*                            Small-step semantics                            *)
 (******************************************************************************)
+
  
 exception NoRuleApplies
+
   
 let rec trace1 = function
     If(True,e1,_) -> e1
@@ -58,6 +61,7 @@ let rec trace e = try
 (******************************************************************************)
 (*                              Big-step semantics                            *)
 (******************************************************************************)
+
 
 let rec eval = function  
       True -> Bool true

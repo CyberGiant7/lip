@@ -1,3 +1,4 @@
+open AndboolexprLib.Ast
 open AndboolexprLib.Main
 
 let tests = [
