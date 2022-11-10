@@ -29,7 +29,8 @@ let rec print_trace = function
 
 let print_type e = try 
     print_endline (string_of_type (typecheck e))
-  with TypeError s -> print_endline s
+  with TypeError s -> print_endline ("Type error: " ^ s)
+  
 ;;
 
 match Array.length(Sys.argv) with

@@ -4,6 +4,9 @@ open Ast
 type exprval = 
     Bool of bool 
   | Nat of int;;
+  
+type exprtype = BoolT | NatT
+;;
 
  let rec string_of_expr = function
     True -> "True"
@@ -18,10 +21,13 @@ type exprval =
   | IsZero(e) -> "IsZero(" ^ (string_of_expr e) ^ ")"
 ;; 
 
+let string_of_type = function
+    BoolT -> "Bool"
+  | NatT -> "Nat"
+
 let string_of_val = function
     Bool(b) -> string_of_bool b
   | Nat(n) -> string_of_int n
-;;
 
 let parse (s : string) : expr =
   let lexbuf = Lexing.from_string s in
@@ -31,10 +37,8 @@ let parse (s : string) : expr =
 (******************************************************************************)
 (*                            Small-step semantics                            *)
 (******************************************************************************)
-
  
 exception NoRuleApplies
-
   
 let rec trace1 = function
     If(True,e1,_) -> e1
@@ -61,7 +65,6 @@ let rec trace e = try
 (******************************************************************************)
 (*                              Big-step semantics                            *)
 (******************************************************************************)
-
 
 let rec eval = function  
       True -> Bool true
@@ -103,3 +106,43 @@ let rec eval = function
     )
   ;;
 
+let rec typecheck = function  
+  True -> BoolT
+| False -> BoolT
+| Not(e) -> (match (typecheck e) with
+      BoolT -> BoolT
+  | _ -> failwith "Nat can't be negated"
+)
+| And(e1,e2) -> (
+  match (typecheck e1, typecheck e2) with
+      (BoolT, BoolT) -> BoolT
+    | _ -> failwith "And is not defined with Nat"
+)
+| Or(e1,e2) -> (
+  match (typecheck e1, typecheck e2) with
+      (BoolT, BoolT) -> BoolT
+    | _ -> failwith "Or is not defined with Nat"
+  )
+| If(e0,e1,e2) -> (
+  match (typecheck e0) with
+    | (BoolT) -> if (
+      match eval e0 with
+          Bool e -> e
+        | _ -> failwith "If condition is not a bool") then typecheck e1 else typecheck e2
+    | _ -> failwith "If condition is not a bool")
+| Zero -> NatT
+| Succ(e) -> (
+  match typecheck e with
+    | NatT-> NatT
+    | _ -> failwith "Succ is not defined with Bool"
+    )
+| Pred (e) -> (
+  match typecheck e with
+  | NatT-> NatT
+  | _ -> failwith "Pred is not defined with Bool"
+  )
+| IsZero(e) -> ( match typecheck e with
+  | NatT-> BoolT
+  | _ -> failwith "Bool can't be Zero"
+)
+;;

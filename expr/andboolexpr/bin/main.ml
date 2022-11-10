@@ -42,7 +42,7 @@ match Array.length(Sys.argv) with
 | 2 -> (match read_file Sys.argv.(1) with
       "" -> print_newline()
     | s -> s |> parse |> eval |> print_bool)
-(* trace / read input from file *)      
+(* trace / read input from stdin *)      
 | 3 when Sys.argv.(1) = "trace" -> (match read_file Sys.argv.(2) with
       "" -> print_newline()
     | s -> s |> parse |> trace |> print_trace)
