@@ -18,7 +18,7 @@ rule read =
   | "then" { THEN }
   | "else" { ELSE }
   | "0" { ZERO }
-  | "succ" { SUCC }
+  | "succ" { SUCC }  
   | "pred" { PRED }
-  | "iszero" { ISZERO } 
+  | "iszero" { ISZERO }    
   | eof { EOF }
