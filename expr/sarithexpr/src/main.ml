@@ -35,10 +35,49 @@ let parse (s : string) : expr =
   ast
 
 (******************************************************************************)
+(*                                Type checking                               *)
+(******************************************************************************)
+
+exception TypeError of string;;
+
+let rec typecheck = function
+    True -> BoolT
+  | False -> BoolT
+  | Not(e) -> (match typecheck e with
+        BoolT -> BoolT
+      | NatT -> raise (TypeError (string_of_expr e ^ " has type Nat, but type Bool was expected")))
+  | And(e1,e2) | Or(e1,e2) ->
+    (match (typecheck e1,typecheck e2) with
+       (BoolT,BoolT) -> BoolT
+     | (NatT,_) -> raise (TypeError (string_of_expr e1 ^ " has type Nat, but type Bool was expected"))
+     | (_,NatT) -> raise (TypeError (string_of_expr e2 ^ " has type Nat, but type Bool was expected")))
+  | If(e0,e1,e2) -> (match (typecheck e0,typecheck e1,typecheck e2) with
+        (NatT,_,_) -> raise (TypeError (string_of_expr e0 ^ " has type Nat, but type Bool was expected"))
+      | (BoolT,t1,t2) when t1=t2 -> t1
+      | (BoolT,t1,t2) -> raise (TypeError (string_of_expr e2 ^ " has type " ^ string_of_type t2 ^ ", but type " ^ string_of_type t1 ^ " was expected"))
+)
+  | Zero -> NatT
+  | Succ(e) | Pred(e) ->
+    (match typecheck e with
+       NatT -> NatT
+     | BoolT -> raise (TypeError (string_of_expr e ^ " has type Bool, but type Nat was expected")))
+  | IsZero(e) -> (match typecheck e with
+       NatT -> BoolT
+     | BoolT -> raise (TypeError (string_of_expr e ^ " has type Bool, but type Nat was expected")))
+;;
+
+(******************************************************************************)
 (*                            Small-step semantics                            *)
 (******************************************************************************)
- 
+
 exception NoRuleApplies
+exception PredOfZero
+
+let rec is_succ = function
+    Zero -> true
+  | Succ(e) -> is_succ e
+  | _ -> false
+;;
   
 let rec trace1 = function
     If(True,e1,_) -> e1
@@ -52,7 +91,14 @@ let rec trace1 = function
   | And(e1,e2) -> let e1' = trace1 e1 in And(e1',e2)
   | Or(True,_) -> True
   | Or(False,e) -> e
-  | Or(e1,e2) -> let e1' = trace1 e1 in Or(e1',e2)    
+  | Or(e1,e2) -> let e1' = trace1 e1 in Or(e1',e2)
+  | Succ(e) -> let e' = trace1 e in Succ(e')
+  | Pred(Zero) -> raise NoRuleApplies
+  | Pred(Succ(e)) when is_succ e -> e
+  | Pred(e) -> let e' = trace1 e in Pred(e')
+  | IsZero(Zero) -> True
+  | IsZero(Succ(e)) when is_succ e -> False    
+  | IsZero(e) -> let e' = trace1 e in IsZero(e')    
   | _ -> raise NoRuleApplies
 ;;
 
@@ -60,7 +106,7 @@ let rec trace e = try
     let e' = trace1 e
     in e::(trace e')
   with NoRuleApplies -> [e]
-;; 
+;;
 
 (******************************************************************************)
 (*                              Big-step semantics                            *)
