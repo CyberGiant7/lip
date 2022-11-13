@@ -3,10 +3,12 @@ open LetarithexprLib.Main
 (* wrapping results for testing *)
 
 type wexprval = Ok of exprval | Error
+;;
 
 let string_of_wval = function 
     Ok v -> string_of_val v
   | _ -> "Error"
+;;
 
 let weval e = try Ok (eval e)
   with _ -> Error
@@ -27,6 +29,7 @@ let tests = [
   ("let x = true in x and let x = false in x", Bool false);
   ("let x = (let x = true in x) and false in x", Bool false);    
 ]
+;;
 
 let oktests = List.map (fun (x,y) -> (x,Ok y)) tests;;
 
@@ -37,10 +40,11 @@ let errtests = [
   ("pred 0", Error);
   ("pred pred succ 0", Error)
 ]
+;;
 
 (* test big-step *)
 
-let%test _ =
+let test _ =
   print_newline();  
   print_endline ("*** Testing big-step semantics...");
   List.fold_left
@@ -55,16 +59,25 @@ let%test _ =
        b && b')
     true
     (oktests @ errtests)
-
+      ;;
+      
+test ();;
 
 (* test small-step *)
 
-let weval_smallstep e = match eval_smallstep e with
+
+
+let eval_smallstep e = try
+  let x = trace e in Some (expr_to_exprval (List.nth x ((List.length x) -1)))
+with _ -> None
+;;
+
+ let weval_smallstep e = match eval_smallstep e with
     None -> Error
   | Some v -> Ok v
 ;;
 
-let%test _ =
+let test _ =
   print_newline();
   print_endline ("*** Testing small-step semantics...");
   List.fold_left
@@ -79,3 +92,6 @@ let%test _ =
        b && b')
     true
     (oktests @ errtests)
+      ;;
+
+test ();;
