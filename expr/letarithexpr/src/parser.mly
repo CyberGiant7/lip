@@ -17,6 +17,10 @@ open Ast
 %token PRED
 %token ISZERO
 %token EOF
+%token <string>VAR
+%token LET
+%token IN
+%token EQ
 
 %nonassoc ELSE
 %left OR
@@ -45,4 +49,6 @@ expr:
   | ISZERO; e=expr {IsZero(e)}
   | SUCC; e=expr {Succ(e)}
   | PRED; e=expr {Pred(e)}
+  | LET; x=VAR; EQ; e1=expr; IN; e2=expr {Let(x,e1,e2)}
+  | x=VAR; {Var(x)}
 ;

@@ -1,11 +1,13 @@
 open ArithexprLib.Ast
 open ArithexprLib.Main
 
-type wexprval = exprval option
+(* wrapping results for testing *)
+
+type wexprval = Ok of exprval | Error;;
 
 let string_of_wval = function 
-    Some v -> string_of_val v
-  | _ -> "Error"
+    Ok v -> string_of_val v
+  | _ -> "Error";;
 
 let weval e = try Some (eval e)
   with _ -> None
@@ -17,7 +19,7 @@ let tests = [
   ("succ succ succ pred pred succ succ pred succ pred succ 0", Nat 3);
   ("iszero pred succ 0", Bool true);
   ("iszero pred succ 0 and not iszero succ pred succ 0", Bool true);
-]
+];;
 
 let oktests = List.map (fun (x,y) -> (x,Some y)) tests;;
 
@@ -28,16 +30,9 @@ let errtests = [
   ("pred 0", None);
   ("pred pred succ 0", None)
 ]
+;;
 
-
-(**********************************************************************
- Test big-step semantics
- **********************************************************************)
-
-let%test _ =
-  print_newline();  
-  print_endline ("*** Testing big-step semantics...");
-  List.fold_left
+let test _ = List.fold_left
     (fun b (s,v) ->
        print_string (s ^ " => ");
        let ar = s |> parse |> weval in
@@ -89,3 +84,6 @@ let%test _ =
        b && b')
     true
     (oktests @ errtests)
+;;
+
+test "";;

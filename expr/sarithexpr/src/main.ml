@@ -1,31 +1,33 @@
 open Ast
 
-type exprtype = BoolT | NatT;;
 
-type exprval = Bool of bool | Nat of int
-
-let string_of_val = function
-    Bool b -> if b then "true" else "false"
-  | Nat n -> string_of_int n
+type exprval = 
+    Bool of bool 
+  | Nat of int;;
+  
+type exprtype = BoolT | NatT
 ;;
 
-let rec string_of_expr = function
-    True -> "true"
-  | False -> "false"
+ let rec string_of_expr = function
+    True -> "True"
+  | False -> "False"
   | Not(e) -> "not " ^ string_of_expr e
   | And(e1,e2) -> string_of_expr e1 ^ " and " ^ string_of_expr e2
   | Or(e1,e2) -> string_of_expr e1 ^ " or " ^ string_of_expr e2                    
   | If(e0,e1,e2) -> "If(" ^ (string_of_expr e0) ^ "," ^ (string_of_expr e1) ^ "," ^ (string_of_expr e2) ^ ")"
   | Zero -> "0"
-  | Succ(e) -> "succ(" ^ string_of_expr e ^ ")"
-  | Pred(e) -> "pred(" ^ string_of_expr e ^ ")"
-  | IsZero(e) -> "iszero(" ^ string_of_expr e ^ ")"
-;;
+  | Succ(e) -> "Succ(" ^ (string_of_expr e) ^ ")"
+  | Pred(e) -> "Pred(" ^ (string_of_expr e) ^ ")"
+  | IsZero(e) -> "IsZero(" ^ (string_of_expr e) ^ ")"
+;; 
 
 let string_of_type = function
-      BoolT -> "Bool"
-    | NatT -> "Nat"
-;;
+    BoolT -> "Bool"
+  | NatT -> "Nat"
+
+let string_of_val = function
+    Bool(b) -> string_of_bool b
+  | Nat(n) -> string_of_int n
 
 let parse (s : string) : expr =
   let lexbuf = Lexing.from_string s in
@@ -110,36 +112,83 @@ let rec trace e = try
 (*                              Big-step semantics                            *)
 (******************************************************************************)
 
-let rec eval = function
-    True -> Bool true
-  | False -> Bool false
-  | Not(e) -> (match eval e with
-        Bool b -> Bool(not b)
-      | _ -> raise (TypeError "Not on nat")
+let rec eval = function  
+      True -> Bool true
+    | False -> Bool false
+    | Not(e) -> (match (eval e) with
+        Bool e -> Bool (not e)
+      | _ -> failwith "Nat can't be negated"
     )
-  | And(e1,e2) -> (match (eval e1,eval e2) with
-        (Bool b1,Bool b2) -> Bool (b1 && b2)
-      | _ -> raise (TypeError "Or on nat")
+    | And(e1,e2) -> (
+      match (eval e1, eval e2) with
+          (Bool e1, Bool e2) -> Bool (e1 && e2)
+        | _ -> failwith "And is not defined with Nat"
     )
-  | Or(e1,e2) -> (match (eval e1,eval e2) with
-        (Bool b1,Bool b2) -> Bool (b1 || b2)
-      | _ -> raise (TypeError "Or on nat")
-    ) 
-  | If(e0,e1,e2) -> (match eval e0 with
-        Bool b -> if b then eval e1 else eval e2
-      | _ -> raise (TypeError "If on nat guard")
+    | Or(e1,e2) -> (
+      match (eval e1, eval e2) with
+          (Bool e1, Bool e2) -> Bool (e1 || e2)
+        | _ -> failwith "Or is not defined with Nat"
+      )
+    | If(e0,e1,e2) -> (
+      match (eval e0) with
+        | (Bool e0) -> if e0 then eval e1 else eval e2
+        | _ -> failwith "If condition is not a bool")
+    | Zero -> Nat 0
+    | Succ(e) -> (
+      match eval e with
+        | Nat n -> Nat (n+1)
+        | _ -> failwith "Succ is not defined with Bool"
+        )
+    | Pred (e) -> (
+      match eval e with
+      | Nat e when (e = 0) -> failwith "Nat can't be negative"
+      | Nat e -> Nat (e-1)
+      | _ -> failwith "Pred is not defined with Bool"
+      )
+    | IsZero(e) -> (
+      match eval e with
+      | Nat e -> Bool (e = 0)
+      | _ -> failwith "Bool can't be Zero"
     )
-  | Zero -> Nat 0
-  | Succ(e) -> (match eval e with
-        Nat n -> Nat (n+1)
-      | _ -> raise (TypeError "Succ on bool")
+  ;;
+
+let rec typecheck = function  
+  True -> BoolT
+| False -> BoolT
+| Not(e) -> (match (typecheck e) with
+      BoolT -> BoolT
+  | _ -> failwith "Nat can't be negated"
+)
+| And(e1,e2) -> (
+  match (typecheck e1, typecheck e2) with
+      (BoolT, BoolT) -> BoolT
+    | _ -> failwith "And is not defined with Nat"
+)
+| Or(e1,e2) -> (
+  match (typecheck e1, typecheck e2) with
+      (BoolT, BoolT) -> BoolT
+    | _ -> failwith "Or is not defined with Nat"
+  )
+| If(e0,e1,e2) -> (
+  match (typecheck e0) with
+    | (BoolT) -> if (
+      match eval e0 with
+          Bool e -> e
+        | _ -> failwith "If condition is not a bool") then typecheck e1 else typecheck e2
+    | _ -> failwith "If condition is not a bool")
+| Zero -> NatT
+| Succ(e) -> (
+  match typecheck e with
+    | NatT-> NatT
+    | _ -> failwith "Succ is not defined with Bool"
     )
-  | Pred(e) -> (match eval e with
-      | Nat n when n>0 -> Nat (n-1)
-      | _ -> raise (TypeError "pred on 0")
-    )
-  | IsZero(e) -> (match eval e with
-      | Nat n -> Bool (n=0)
-      | _ -> raise (TypeError "IsZero on bool")
-    )
+| Pred (e) -> (
+  match typecheck e with
+  | NatT-> NatT
+  | _ -> failwith "Pred is not defined with Bool"
+  )
+| IsZero(e) -> ( match typecheck e with
+  | NatT-> BoolT
+  | _ -> failwith "Bool can't be Zero"
+)
 ;;

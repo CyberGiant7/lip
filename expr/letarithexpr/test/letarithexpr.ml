@@ -2,11 +2,17 @@ open LetarithexprLib.Main
 
 (* wrapping results for testing *)
 
+<<<<<<< HEAD
+type wexprval = Ok of exprval | Error
+;;
+=======
 type wexprval = exprval option
+>>>>>>> 107f2c160281de40228232604da8d0ce64ee5c10
 
 let string_of_wval = function 
     Some v -> string_of_val v
   | _ -> "Error"
+;;
 
 let weval e = try Some (eval e)
   with _ -> None
@@ -30,6 +36,7 @@ let tests = [
   ("let x = (let x = true in x) and false in x", Bool false);
   ("let x = (let x = 0 in iszero succ x) or let y = true in y in x", Bool true);      
 ]
+;;
 
 let oktests = List.map (fun (x,y) -> (x,Some y)) tests
 
@@ -41,13 +48,14 @@ let errtests = [
   ("pred pred succ 0", None);
   ("let x = iszero (let x = 0 in succ x) or x in x", None);
 ]
+;;
 
 
 (**********************************************************************
  Test big-step semantics
  **********************************************************************)
 
-let%test _ =
+let test _ =
   print_newline();  
   print_endline ("*** Testing big-step semantics...");
   List.fold_left
@@ -62,13 +70,25 @@ let%test _ =
        b && b')
     true
     (oktests @ errtests)
+      ;;
+      
+test ();;
+
+(* test small-step *)
 
 
-(**********************************************************************
- Test small-step semantics
- **********************************************************************)
 
-let%test _ =
+let eval_smallstep e = try
+  let x = trace e in Some (expr_to_exprval (List.nth x ((List.length x) -1)))
+with _ -> None
+;;
+
+ let weval_smallstep e = match eval_smallstep e with
+    None -> Error
+  | Some v -> Ok v
+;;
+
+let test _ =
   print_newline();
   print_endline ("*** Testing small-step semantics...");
   List.fold_left
@@ -83,3 +103,6 @@ let%test _ =
        b && b')
     true
     (oktests @ errtests)
+      ;;
+
+test ();;

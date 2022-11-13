@@ -1,10 +1,6 @@
 open Ast
 
 
-type exprval = 
-    Bool of bool 
-  | Nat of int;;
-
  let rec string_of_expr = function
     True -> "True"
   | False -> "False"
@@ -18,10 +14,6 @@ type exprval =
   | IsZero(e) -> "IsZero(" ^ (string_of_expr e) ^ ")"
 ;; 
 
-let string_of_val = function
-    Bool(b) -> string_of_bool b
-  | Nat(n) -> string_of_int n
-;;
 
 let parse (s : string) : expr =
   let lexbuf = Lexing.from_string s in
@@ -31,10 +23,8 @@ let parse (s : string) : expr =
 (******************************************************************************)
 (*                            Small-step semantics                            *)
 (******************************************************************************)
-
  
 exception NoRuleApplies
-
   
 let rec trace1 = function
     If(True,e1,_) -> e1
@@ -62,44 +52,16 @@ let rec trace e = try
 (*                              Big-step semantics                            *)
 (******************************************************************************)
 
-
 let rec eval = function  
-      True -> Bool true
-    | False -> Bool false
-    | Not(e) -> (match (eval e) with
-        Bool e -> Bool (not e)
-      | _ -> failwith "Nat can't be negated"
-    )
-    | And(e1,e2) -> (
-      match (eval e1, eval e2) with
-          (Bool e1, Bool e2) -> Bool (e1 && e2)
-        | _ -> failwith "And is not defined with Nat"
-    )
-    | Or(e1,e2) -> (
-      match (eval e1, eval e2) with
-          (Bool e1, Bool e2) -> Bool (e1 || e2)
-        | _ -> failwith "Or is not defined with Nat"
-      )
-    | If(e0,e1,e2) -> (
-      match (eval e0) with
-        | (Bool e0) -> if e0 then eval e1 else eval e2
-        | _ -> failwith "If condition is not a bool")
-    | Zero -> Nat 0
-    | Succ(e) -> (
-      match eval e with
-        | Nat n -> Nat (n+1)
-        | _ -> failwith "Succ is not defined with Bool"
-        )
-    | Pred (e) -> (
-      match eval e with
-      | Nat e when (e = 0) -> failwith "Nat can't be negative"
-      | Nat e -> Nat (e-1)
-      | _ -> failwith "Pred is not defined with Bool"
-      )
-    | IsZero(e) -> (
-      match eval e with
-      | Nat e -> Bool (e = 0)
-      | _ -> failwith "Bool can't be Zero"
-    )
+    True -> 1
+    | False -> 0
+    | Not(e) -> if eval e >= 1 then 0 else 1
+    | And(e1,e2) -> if eval e1 >= 1 && eval e2 >= 1 then 1 else 0
+    | Or(e1,e2) -> if eval e1 >= 1 || eval e2 >= 1 then 1 else 0
+    | If(e0,e1,e2) -> if eval e0 >= 1 then eval e1 else eval e2
+    | Zero -> 0
+    | Succ(e) -> eval e + 1
+    | Pred(e) -> if eval e > 0 then eval e - 1 else 0  
+    | IsZero(e) -> if eval e = 0 then 1 else 0
   ;;
 
