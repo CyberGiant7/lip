@@ -26,6 +26,10 @@ let test_parse = [
   ("pair",t_pair);
   ("fst",t_fst);
   ("snd",t_snd);
+  ("scc",t_scc);
+  ("prd (scc 0)",App(t_prd,App(t_scc,t_nat 0)));  
+  ("add",t_add);
+  ("prd",t_prd);    
   ("0", t_nat(0));
   ("1", t_nat(1));
   ("2", t_nat(2));
@@ -220,7 +224,13 @@ let test_church = [
   ("fst (pair " ^ t1 ^ t2 ^ ")", 6, t1);
   ("snd (pair " ^ t1 ^ t2 ^ ")", 6, t2);
   ("scc 1", 3, "2");
-  ("scc (scc 1)", 6, "3");
+  ("scc (scc 1)", 6, "3");  
+  ("add (scc 1) (scc 1)", 20, "4");
+  ("add (add (scc 1) (scc 1)) (add (scc 1) (scc 1))", 100, "8");  
+  ("prd 0", 10, "0");  
+  ("prd (scc 0)", 20, "0");
+  ("prd (scc 1)", 40, "1");
+  ("prd (prd (scc 1))", 80, "0");
   ("scc (scc (scc (scc 1)))", 12, "5");
 ]
 

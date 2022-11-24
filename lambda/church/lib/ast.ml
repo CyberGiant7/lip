@@ -24,6 +24,13 @@ let t_nat n = Abs("s",Abs("z",t_nat_rec n))
 
 let t_scc = Abs("n",Abs("s",Abs("z",App(Var "s",App(App(Var "n",Var "s"),Var "z")))))
 
+let t_add = Abs("m",Abs("n",Abs("s",Abs("z",App(App(Var "m",Var "s"),App(App(Var "n",Var "s"),Var "z"))))))
+    
+let zz = App(App(t_pair,(t_nat 0)),(t_nat 0))
+and ss = Abs("p", App(App(t_pair,(App(t_snd,(Var "p")))),(App(App(t_add,(t_nat 1)),(App(t_snd,(Var "p")))))))
+
+let t_prd = Abs("m",App(t_fst,(App(App(Var "m",ss),zz))))
+    
 let s_id  = "(fun x . x)"
 let s_omega = "(fun x. x x)"
 
