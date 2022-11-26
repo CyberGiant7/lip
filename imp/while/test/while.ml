@@ -16,7 +16,7 @@ let test_parse = [
   ]
 ;;
 
-let test _ =
+let%test _ =
   print_newline ();
   print_endline ("*** Testing parse...");
   List.fold_left
