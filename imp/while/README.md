@@ -34,6 +34,20 @@ type state = ide -> exprval                     (* state = map from identifiers 
 type conf = St of state | Cmd of cmd * state    (* configuration = state | (command,state) *)
 ```
 
+## Concrete syntax
+
+Refer to the [tests](test/while.ml) for the concrete syntax of the language. 
+For instance, the Euclid algorithm for computing the GCD can be written as follows:
+```pascal
+a:=24;
+b:=60;
+while not a=b do (
+     if not a<=b then a:=a-b
+     else b:=b-a
+);
+gcd:=a
+```
+
 ## Pretty printing
 
 Implement the following functions to convert data into strings:
