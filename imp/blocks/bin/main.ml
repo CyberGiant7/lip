@@ -1,7 +1,7 @@
-open WhileLib.Types
-open WhileLib.Prettyprint       
-open WhileLib.Main
-
+open BlocksLib.Types
+open BlocksLib.Prettyprint
+open BlocksLib.Main
+       
 (* read file, and output it to a string *)
 
 let read_file filename =
@@ -18,7 +18,7 @@ let read_line () =
 (* print a trace *)
 
 let print_trace = function
-  | Cmd(c,s)::l -> print_string (string_of_trace (vars_of_cmd c) (Cmd(c,s)::l))
+  | Cmd(c,s)::l -> print_endline (string_of_trace (vars_of_cmd c) (Cmd(c,s)::l))
   | _ -> failwith "print_trace on empty trace"
 ;;
 
@@ -35,4 +35,4 @@ match Array.length(Sys.argv) with
           "" -> print_newline()
         | s -> s |> parse |> (fun x -> trace n x) |> print_trace)
 (* wrong usage *)      
-| _ -> failwith "Usage: dune exec while n_steps [file]"
+| _ -> failwith "Usage: dune exec blocks n_steps [file]"
