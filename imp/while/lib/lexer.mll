@@ -34,6 +34,7 @@ rule read =
   | "do" { DO }
   | ";" { COL }
   | "*" { MUL }
+  | "skip" { SKIP }
   | number {CONST (int_of_string  (Lexing.lexeme lexbuf))}
   | id { VAR (Lexing.lexeme lexbuf) }
   | eof { EOF }

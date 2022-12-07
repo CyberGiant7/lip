@@ -31,9 +31,9 @@ open Ast
 %left OR
 %left AND
 %left NOT
-
-
-
+%left EQ LEQ
+%left PLUS MINUS
+%left MUL
 
 %start <cmd> prog
 
@@ -49,6 +49,8 @@ cmd:
   | x=VAR ; ASS ; n=expr { Assign(x, n)}
   | SKIP {Skip}
   | c1 = cmd; COL; c2 = cmd { Seq(c1, c2) }
+  | LPAREN; c = cmd; RPAREN { c }
+  | c = cmd; COL { c }
 
 
 expr:
