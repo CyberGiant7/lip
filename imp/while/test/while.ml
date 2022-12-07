@@ -4,7 +4,7 @@ open WhileLib.Prettyprint
 open WhileLib.Main
 
 (**********************************************************************
- parse test : (variable, term, expected result)
+   parse test : (variable, term, expected result)
  **********************************************************************)
 
 let test_parse = [
@@ -13,7 +13,10 @@ let test_parse = [
   ("x:=0; if x=0 then y:=1 else y:=0", Seq(Assign("x",Const(0)),If(Eq(Var("x"),Const(0)),Assign("y",Const(1)),Assign("y",Const(0)))));
   ("x:=0; if x=0 then y:=1 else y:=0; x:=2", Seq(Seq(Assign("x",Const(0)),If(Eq(Var("x"),Const(0)),Assign("y",Const(1)),Assign("y",Const(0)))),Assign("x",Const(2))));
   ("x:=3; while x<=0 do x:=x-1; y:=0", Seq(Seq(Assign("x",Const(3)),While(Leq(Var "x",Const 0),Assign("x",Sub(Var "x",Const 1)))),Assign("y",Const(0))));  
+  ("x:=3; z:=2; y:=0", Seq(Seq(Assign("x",Const(3)),Assign("z",Const(2))),Assign("y",Const(0))));  
+
 ]
+;;
 
 let%test _ =
   print_newline ();
@@ -28,9 +31,11 @@ let%test _ =
     true
     test_parse
 
+;;
+
 
 (**********************************************************************
- trace test : (command, n_steps, variable, expected value after n_steps)
+   trace test : (command, n_steps, variable, expected value after n_steps)
  **********************************************************************)
 
 let test_trace = [
@@ -46,7 +51,7 @@ let test_trace = [
   ("x:=2; y:=1; z:=3; if x<=y and x<=z then min:=x else (if y<=z then min:=y else min:=z)", 10, "min", Nat 1);
   ("x:=2; y:=3; z:=1; if x<=y and x<=z then min:=x else (if y<=z then min:=y else min:=z)", 10, "min", Nat 1);          
 ]
-              
+
 let%test _ =
   print_newline();
   print_endline ("*** Testing trace...");  
@@ -62,4 +67,4 @@ let%test _ =
        print_newline();
        b && b')
     true
-    test_trace
+    test_trace 

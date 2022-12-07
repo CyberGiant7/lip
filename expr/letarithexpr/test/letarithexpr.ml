@@ -2,12 +2,10 @@ open LetarithexprLib.Main
 
 (* wrapping results for testing *)
 
-<<<<<<< HEAD
-type wexprval = Ok of exprval | Error
-;;
-=======
-type wexprval = exprval option
->>>>>>> 107f2c160281de40228232604da8d0ce64ee5c10
+type wexprval = Ok of exprval | Error;;
+
+(* type wexprval = exprval option *)
+
 
 let string_of_wval = function 
     Some v -> string_of_val v
