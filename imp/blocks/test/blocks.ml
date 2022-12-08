@@ -1,5 +1,5 @@
 open BlocksLib.Ast
-open BlocksLib.Types       
+open BlocksLib.Types
 open BlocksLib.Prettyprint
 open BlocksLib.Main
        
@@ -32,7 +32,7 @@ let%test _ =
 (**********************************************************************
  trace test : (command, n_steps, location, expected value after n_steps)
  **********************************************************************)
-
+ 
 let test_trace = [
   ("{ int x; x:=51 }", 2, 0, Int 51);
   ("{ int x; x:=0; x:=x+1 }", 5, 0, Int 1);
@@ -65,4 +65,25 @@ let%test _ =
        print_newline();
        b && b')
     true
-    test_trace
+    test_trace 
+
+(* 
+    {
+      int y; 
+      int x; 
+      x:=50; 
+      {
+        int x; 
+        x:=40;
+        y:=x+2 
+      }
+    } *)
+    (* Decl(
+    IntVar(y,IntVar(x,EmptyDecl)), 
+    Seq(
+        Assign(x, 50),
+        Decl(IntVar(x),EmptyDecl),
+            Seq(Assign(x, 40), Assign(y, x+2))
+
+      )) 
+    *)

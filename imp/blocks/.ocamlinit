@@ -1,2 +1,4 @@
 open BlocksLib.Ast;;
 open BlocksLib.Main;;
+open BlocksLib.Prettyprint;;
+open BlocksLib.Types;;

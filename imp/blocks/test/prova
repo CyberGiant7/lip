@@ -1,0 +1,15 @@
+{
+    int a;
+    int b;
+    int i;
+    int res;
+    a:= 1;
+    b:= 2;
+    i:= 0;
+    while i<=9 do {
+        a:= a + 1;
+        b:= b + 2;
+        i:= i+1;
+    };
+    res:= a + b;
+}

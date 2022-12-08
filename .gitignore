@@ -1,6 +1,2 @@
 *~
-expr/sarithexpr/_build
-expr/uarithexpr/_build
-expr/letarithexpr/_build
-lambda/untyped/_build
-imp/while/_build
+*/*/_build

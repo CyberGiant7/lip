@@ -1,5 +1,5 @@
 type ide = string
-  
+
 type expr =
   | True
   | False
