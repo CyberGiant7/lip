@@ -58,7 +58,8 @@ Look [here](install-ocaml) for minimal instructions.
 ## Imperative languages
 
 1. [A simple imperative language](imp/while)
-1. [Imperative language with blocks](imp/blocks)
+1. [Declaration blocks](imp/blocks)
+1. [Functions](imp/fun)
 
 ## References
 

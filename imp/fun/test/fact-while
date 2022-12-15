@@ -1,0 +1,4 @@
+int x;
+int r;
+fun f(n) { r:=1; while not (n<=0) do (r:=r*n; n:=n-1); return r };
+x := f(5)
