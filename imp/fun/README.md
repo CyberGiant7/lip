@@ -53,8 +53,10 @@ The states of the small-step semantics are triples containing
 a stack of environments, a memory, and an integer representing the first free memory location.
 We represent states in OCaml by the type `state` defined as follows:
 ```ocaml
-type envval = BVar of loc | IVar of loc
-type memval = Bool of bool | Int of int
+type loc = int
+
+type envval = IVar of loc | IFun of ide * cmd * expr
+type memval = int
 
 type env = ide -> envval
 type mem = loc -> memval

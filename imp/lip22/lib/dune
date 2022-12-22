@@ -1,0 +1,7 @@
+(library
+ (name lip22Lib))
+
+(menhir
+ (modules parser))
+
+(ocamllex lexer)
