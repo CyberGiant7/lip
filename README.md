@@ -2,7 +2,7 @@
 
 LiP students are expected to fork the repository and push solutions to the exercises on their fork.
 
-Invitation to the Discord server: **https://discord.gg/hnzhuVv9** (expires on November 8th, 2022)
+Invitation to the Discord server: **https://discord.gg/CW84hS82**
 
 ## Ocaml basics #1
 
